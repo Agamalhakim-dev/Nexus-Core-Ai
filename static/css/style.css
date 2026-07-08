@@ -1,0 +1,1929 @@
+/* ==========================================
+   COLOR VARIABLES & RESET
+   ========================================== */
+:root {
+    --bg-color: #050505; /* Blackish */
+    --surface-color: rgba(15, 15, 15, 0.85); /* Darker surface */
+    --surface-hover: #1a1a1a;
+    --text-primary: #e0e0e0;
+    --text-secondary: #888888;
+    --accent-color: #00ff41; /* Neon Green */
+    --accent-hover: #00cc33; /* Darker Neon Green */
+    --danger-color: #ef4444;
+    --border-color: rgba(0, 255, 65, 0.15); /* Subtle green border */
+    --bg-primary: var(--bg-color);
+    --primary-color: var(--accent-color);
+    --bg-tertiary: rgba(10, 10, 10, 0.7);
+    --sidebar-width: 280px;
+}
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+}
+
+img, svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.text {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.message.assistant .text pre,
+.message.assistant .text code {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   APP CONTAINER - Tata letak utama (flex row)
+   ========================================== */
+.app-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--surface-color);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    position: relative;
+}
+
+/* ==========================================
+   SCROLLBAR
+   ========================================== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface-hover); border-radius: 10px; }
+
+/* ==========================================
+   SIDEBAR
+   ========================================== */
+.sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    height: 100%;
+    background: rgba(10, 10, 10, 0.97);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: transform 0.3s ease, min-width 0.3s ease, width 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.sidebar.collapsed {
+    transform: translateX(-100%);
+    width: 0;
+    min-width: 0;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+/* Aksi di dalam riwayat obrolan (Obrolan Baru, Tentang AI) */
+.sidebar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.action-list-btn {
+    background: transparent;
+    color: var(--text-primary);
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.action-list-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.close-sidebar-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    font-size: 1.15rem;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.close-sidebar-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.session-list-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.session-item {
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.2s;
+    cursor: pointer;
+    color: var(--text-primary);
+    text-align: left;
+    width: 100%;
+    position: relative;
+}
+
+.session-item:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+.session-item.active {
+    background: rgba(0, 255, 65, 0.08);
+    border-left: 2px solid var(--accent-color);
+    padding-left: 12px;
+}
+
+.session-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.9rem;
+    font-family: 'Poppins', sans-serif;
+    transition: opacity 0.3s ease;
+}
+
+.session-icon {
+    color: var(--text-secondary);
+    margin-right: 10px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+/* Tombol titik tiga â€” muncul saat hover */
+.session-menu-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    padding: 4px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+
+.session-item:hover .session-menu-btn {
+    opacity: 1;
+}
+
+.session-menu-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.1);
+}
+
+/* Pop-up menu konteks (hapus/edit) */
+.session-context-menu {
+    position: fixed;
+    background: #1a1a1a;
+    border: 1px solid rgba(0,255,65,0.2);
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+    z-index: 9999;
+    min-width: 140px;
+    animation: popupIn 0.12s ease;
+}
+
+.session-context-menu button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    text-align: left;
+}
+
+.session-context-menu button:hover {
+    background: rgba(255,255,255,0.07);
+    color: var(--text-primary);
+}
+
+.session-context-menu button.danger:hover {
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+}
+
+/* Input rename inline */
+.session-rename-input {
+    flex: 1;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--accent-color);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+    width: 100%;
+}
+
+/* Chat Area */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+}
+
+/* Toggle Sidebar di Header (Polos, hanya muncul saat sidebar collapsed) */
+.header-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: none; /* Sembunyikan saat sidebar terbuka */
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-right: 12px; /* Jarak antara toggle dengan logo */
+    transition: color 0.2s ease;
+}
+
+.header-toggle-btn:hover {
+    color: var(--text-primary);
+}
+
+/* Munculkan toggle ini HANYA SAAT sidebar collapsed */
+.sidebar.collapsed ~ .chat-area .header-toggle-btn {
+    display: flex;
+}
+
+.chat-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-logo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.header-info h1 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.header-info p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-primary);
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.main-content.drag-highlight {
+    background-color: rgba(66, 133, 244, 0.05);
+}
+
+.main-content.drag-highlight::after {
+    content: "Lepaskan File / Folder di sini";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 15, 15, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    border: 3px dashed var(--primary-color);
+    border-radius: 8px;
+    margin: 10px;
+}
+
+.messages {
+    flex: 1;
+    min-height: 0;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.empty-chat-state {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.empty-chat-state.hidden {
+    display: none;
+}
+
+.empty-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+.message {
+    display: flex;
+    flex-direction: column;
+    max-width: min(85%, 760px);
+    gap: 8px;
+    box-sizing: border-box;
+}
+
+.message.user {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.message.assistant {
+    align-self: flex-start;
+    align-items: flex-start;
+}
+
+.text {
+    padding: 16px 20px;
+    border-radius: 20px;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.message.user .text {
+    background: #2c2c2c; /* Gray background for user message */
+    color: white;
+    border-bottom-right-radius: 4px;
+    font-family: 'Poppins', sans-serif;
+    position: relative;
+}
+
+/* User Message Tools Wrapper */
+.message-tools {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    align-self: flex-end;
+}
+
+.message.user:hover .message-tools {
+    opacity: 1;
+}
+
+.message-tool-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.message-tool-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-primary);
+}
+
+/* Edit Prompt Container */
+.edit-prompt-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 300px;
+    gap: 10px;
+    background: var(--bg-secondary);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.edit-prompt-textarea {
+    width: 100%;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+}
+
+.edit-prompt-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.edit-prompt-cancel {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-prompt-save {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-prompt-save:hover {
+    background: #0056b3;
+}
+
+.message.assistant .text {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ==========================================
+   TOMBOL AKSI PADA PESAN (COPY & EXPORT)
+   ========================================== */
+.action-buttons-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn {
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.action-btn i {
+    font-size: 0.9rem;
+}
+
+.word-btn:hover {
+    background-color: #2b579a;
+    color: white;
+}
+
+.excel-btn:hover {
+    background-color: #217346;
+    color: white;
+}
+
+/* Markdown Styling in Chat */
+.message.assistant .text p {
+    margin-bottom: 10px;
+}
+.message.assistant .text p:last-child {
+    margin-bottom: 0;
+}
+.message.assistant .text pre {
+    background: #000;
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 0;
+}
+
+/* Wrapper Khusus Kodingan */
+.code-block-wrapper {
+    position: relative;
+    margin: 15px 0;
+    background: #000;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 36px; /* Ruang untuk header bahasa di atas */
+}
+
+/* Label Bahasa Pemrograman di Kiri Atas */
+.code-block-wrapper::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-bottom-left-radius: 8px;
+    border-top-right-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+}
+
+/* Beri ruang ekstra di bawah agar kode tidak tertutup tombol Salin */
+.code-block-wrapper pre {
+    margin: 0;
+    border: none;
+    padding-bottom: 45px; /* Ruang untuk tombol copy di bawah */
+}
+
+/* Tombol Salin Khusus Kodingan di Pojok Kanan Bawah */
+.code-copy-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 10;
+}
+
+.code-copy-btn:hover {
+    background: transparent;
+    color: var(--text-primary);
+}
+.message.assistant .text code {
+    font-family: monospace;
+    background: rgba(0,0,0,0.3);
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+.message.assistant .text ul, .message.assistant .text ol {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+/* Empty State Greeting (Gemini Style) */
+.empty-state-greeting {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.empty-state-greeting h1 {
+    font-size: 2.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: linear-gradient(90deg, #4285f4, #d96570, #9b72cb);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.9;
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 0.9; transform: translateY(0); }
+}
+
+/* ==========================================
+   MODEL SELECTOR
+   ========================================== */
+.model-selector-container {
+    position: relative;
+    align-self: flex-start;
+    margin-bottom: -4px;
+    z-index: 100;
+}
+
+.model-selector-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.model-selector-btn i.fa-chevron-up {
+    transition: transform 0.3s ease;
+}
+
+.model-selector-btn.open i.fa-chevron-up {
+    transform: rotate(180deg);
+}
+
+.model-selector-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.model-menu {
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 0;
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    min-width: 280px;
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    animation: popupIn 0.2s ease;
+    transform-origin: bottom center;
+}
+
+.model-menu.hidden {
+    display: none;
+}
+
+.model-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: var(--text-secondary);
+}
+
+.model-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.model-option.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.model-option i {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+}
+
+.model-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.model-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.model-desc {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.chat-input-wrapper {
+    padding: 16px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.file-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 10px;
+}
+
+.file-preview-container.hidden {
+    display: none;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid var(--accent-color);
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+.file-item .remove-file-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    transition: all 0.4s ease;
+}
+
+.file-item .remove-file-btn i {
+    transition: transform 0.4s ease;
+}
+
+.file-item .remove-file-btn:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+.file-item .remove-file-btn:hover i {
+    transform: rotate(180deg);
+}
+
+.hidden-file-input {
+    display: none;
+}
+
+.chat-input-container {
+    background: rgba(15, 15, 15, 0.9);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.chat-input-top-row {
+    display: flex;
+    width: 100%;
+}
+
+.chat-input-top-row textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 8px 4px;
+    font-size: 1rem;
+    color: var(--text-primary);
+    outline: none;
+    resize: none;
+    overflow-y: auto;
+    max-height: 200px;
+    min-height: 30px;
+    line-height: 1.5;
+    font-family: 'Inter', sans-serif;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+
+.chat-input-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.chat-input-tools-left,
+.chat-input-tools-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Tombol Upload (Plus icon) */
+.upload-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background 0.2s, color 0.2s;
+}
+
+.upload-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+/* Model Selector Button inside Chat Input */
+.model-selector-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.model-selector-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+/* Tombol Mic */
+.mic-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.2s, color 0.2s;
+}
+
+.mic-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+/* Tombol Kirim */
+.send-btn {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    font-size: 1.1rem;
+    background: var(--accent-color);
+    color: #000; /* Contrast against neon green */
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.send-btn:hover {
+    background: var(--accent-hover);
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.5); /* Neon glow effect */
+}
+
+.send-btn:active {
+    transform: scale(0.96);
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    gap: 6px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+    width: fit-content;
+    margin: 0 30px 10px 30px;
+}
+
+.typing-indicator.hidden {
+    display: none;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+/* ==========================================
+   HALAMAN LOGIN & AUTH
+   ========================================== */
+/* ==========================================
+   HALAMAN LOGIN â€” VIDEO BACKGROUND
+   ========================================== */
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    /* Fallback background jika video belum dimuat */
+    background: linear-gradient(135deg, #0d0d1a 0%, #1a0d2e 50%, #0d1a2e 100%);
+}
+
+/* Video fullscreen background */
+.login-video-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 0;
+}
+
+/* Overlay tipis di atas video agar card terbaca */
+.login-video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1;
+}
+
+.login-box {
+    /* Glassmorphism: transparan dengan blur */
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    padding: 50px 40px;
+    border-radius: 24px;
+    text-align: center;
+    max-width: 420px;
+    width: 90%;
+    position: relative;
+    z-index: 2;
+    animation: loginFadeIn 0.6s ease;
+}
+
+@keyframes loginFadeIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Logo terpusat */
+.login-logo-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.login-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 8px 30px rgba(120, 80, 255, 0.3);
+    border: 3px solid rgba(255, 255, 255, 0.7);
+    display: block;
+    margin: 0 auto 10px auto;
+}
+
+.login-logo-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+.login-box h2 {
+    color: #ffffff;
+    margin-bottom: 12px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.login-box p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 28px;
+    font-size: 0.93rem;
+    line-height: 1.6;
+}
+
+.login-box .version-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: rgba(200, 180, 255, 0.9);
+    background: rgba(120, 80, 255, 0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(160, 120, 255, 0.3);
+}
+
+.login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.google-login {
+    background: rgba(255, 255, 255, 0.85);
+    color: #333;
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+.google-login:hover {
+    background: #fff;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.github-login {
+    background: rgba(36, 41, 46, 0.85);
+    color: #fff;
+    border-color: rgba(36, 41, 46, 0.5);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+.github-login:hover {
+    background: rgba(27, 31, 35, 0.95);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+
+/* ==========================================
+   SIDEBAR USER PROFILE
+   ========================================== */
+.user-profile-sidebar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 10px;
+    margin: 0 10px 10px 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    position: relative;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.user-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+}
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.user-email {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.settings-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.settings-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-primary);
+}
+
+/* â”€â”€ Settings / Logout Popup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.settings-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #111;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    overflow: hidden;
+    z-index: 200;
+    animation: popupIn 0.15s ease;
+}
+
+@keyframes popupIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.settings-menu.hidden {
+    display: none;
+}
+
+/* Header popup: avatar + nama + email */
+.settings-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 14px 10px;
+}
+.menu-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.menu-user-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.menu-user-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.menu-user-email {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.settings-menu-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 0 10px;
+}
+
+/* Tombol Logout */
+.logout-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    color: var(--danger-color);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.logout-link:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+.logout-link i {
+    font-size: 0.9rem;
+}
+
+/* ==========================================
+   OVERLAY TENTANG AI
+   ========================================== */
+.about-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+.about-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.about-container {
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 40px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+.about-overlay.hidden .about-container {
+    transform: translateY(20px);
+}
+.close-about-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s ease;
+}
+.close-about-btn i {
+    transition: transform 0.4s ease;
+}
+.close-about-btn:hover {
+    background: var(--danger-color);
+    color: white;
+}
+.close-about-btn:hover i {
+    transform: rotate(180deg);
+}
+.about-profiles {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    max-width: 160px;
+}
+.profile-card img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.profile-divider {
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 33px;
+}
+.profile-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-top: 5px;
+    text-align: center;
+}
+.profile-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.3;
+    word-break: break-word;
+}
+.about-text {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+.about-text h3 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+.about-text p {
+    font-size: 0.95rem;
+}
+.about-text strong {
+    color: var(--text-primary);
+}
+.about-ai-btn {
+    flex: 1;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.about-ai-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+/* ==========================================
+   MOBILE RESPONSIVE â€” â‰¤ 768px
+   ========================================== */
+@media (max-width: 768px) {
+
+    /* â”€â”€ Reset dasar â”€â”€ */
+    html, body {
+        height: 100%;
+        height: 100dvh;
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+    }
+
+    /* â”€â”€ App Container: kolom penuh â”€â”€ */
+    .app-container {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        height: 100dvh;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    /* â”€â”€ Sidebar: Geser dari kiri sebagai overlay â”€â”€ */
+    .sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        height: 100% !important;
+        height: 100dvh !important;
+        width: min(80vw, 300px) !important;
+        min-width: unset !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s ease !important;
+        z-index: 1000 !important;
+        box-shadow: 6px 0 40px rgba(0, 0, 0, 0.9);
+        background: rgba(5, 5, 5, 0.99) !important;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Override collapsed â€” di mobile TIDAK pakai collapsed, pakai show */
+    .sidebar.collapsed {
+        transform: translateX(-100%) !important;
+        width: min(80vw, 300px) !important;
+        min-width: unset !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    /* Sidebar terbuka di mobile */
+    .sidebar.show {
+        transform: translateX(0) !important;
+    }
+
+    /* â”€â”€ Overlay hitam saat sidebar terbuka â”€â”€ */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        z-index: 999;
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    /* â”€â”€ Main Area â”€â”€ */
+    .chat-area {
+        width: 100% !important;
+        flex: 1;
+        height: 100%;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+        width: 100%;
+    }
+
+    /* â”€â”€ Header â”€â”€ */
+    .chat-header {
+        padding: 10px 14px !important;
+        height: auto !important;
+        min-height: 54px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    /* Tombol sidebar di header â€” SELALU tampil di mobile */
+    .header-toggle-btn {
+        display: flex !important;
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        font-size: 1.15rem;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+    }
+
+    /* Sembunyikan relasi CSS desktop untuk toggle header */
+    .sidebar.collapsed ~ .chat-area .header-toggle-btn {
+        display: flex !important;
+    }
+
+    .header-logo img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .header-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .header-info h1 {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .header-info p {
+        font-size: 0.68rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    /* â”€â”€ Pesan Chat â”€â”€ */
+    .messages {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 12px 10px;
+        /* ruang bawah = tinggi input wrapper kira-kira */
+        padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+        gap: 14px;
+    }
+
+    .message {
+        max-width: 95%;
+    }
+
+    .message.user {
+        font-size: 0.92rem;
+    }
+
+    .message.assistant .text {
+        font-size: 0.9rem;
+    }
+
+    .message.assistant .text pre {
+        font-size: 0.78rem;
+        padding: 10px;
+        overflow-x: auto;
+    }
+
+    /* â”€â”€ Area Input (Fixed bawah) â”€â”€ */
+    .chat-input-wrapper {
+        position: fixed !important;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 8px 10px;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+        background: rgba(5, 5, 5, 0.98) !important;
+        border-top: 1px solid var(--border-color);
+        z-index: 500;
+        box-sizing: border-box;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .chat-input-container {
+        padding: 6px 8px;
+        border-radius: 16px;
+    }
+
+    .chat-input-top-row textarea {
+        font-size: 16px; /* 16px minimal supaya iOS TIDAK auto-zoom */
+        padding: 6px 4px;
+        min-height: 34px;
+    }
+
+    .chat-input-tools-left,
+    .chat-input-tools-right {
+        gap: 4px;
+    }
+
+    .send-btn, .upload-btn, .mic-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .upload-btn {
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+        font-size: 1rem;
+    }
+
+    /* â”€â”€ Model Selector â”€â”€ */
+    .model-selector-container {
+        align-self: flex-start;
+        z-index: 501;
+    }
+
+    .model-menu {
+        left: 0 !important;
+        right: auto !important;
+        bottom: calc(100% + 8px);
+        min-width: 220px;
+        max-width: calc(100vw - 20px);
+        border-radius: 16px;
+    }
+
+    .model-selector-btn {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
+
+    /* â”€â”€ File Preview â”€â”€ */
+    .file-preview-container {
+        padding: 0 4px;
+        gap: 6px;
+    }
+
+    .file-item {
+        padding: 4px 10px;
+        font-size: 0.78rem;
+    }
+
+    /* â”€â”€ Greeting Kosong â”€â”€ */
+    .empty-state-greeting h1 {
+        font-size: 1.5rem;
+        padding: 0 16px;
+    }
+
+    /* â”€â”€ About Overlay â”€â”€ */
+    .about-container {
+        width: 95%;
+        padding: 20px 14px;
+        max-height: 90%;
+        max-height: 90dvh;
+        overflow-y: auto;
+    }
+
+    .about-profiles {
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .profile-divider { display: none; }
+
+    /* â”€â”€ Code block â”€â”€ */
+    .code-block-wrapper {
+        font-size: 0.8rem;
+    }
+
+    /* â”€â”€ Typing indicator â”€â”€ */
+    .typing-indicator {
+        margin-bottom: 0;
+    }
+}
+
+/* ==========================================
+   LAYAR SANGAT KECIL â€” â‰¤ 390px (iPhone SE, dll)
+   ========================================== */
+@media (max-width: 390px) {
+    .header-info p { display: none; }
+    .header-info h1 { font-size: 0.88rem; }
+
+    .messages {
+        padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .chat-input-top-row textarea {
+        font-size: 16px;
+    }
+
+    .empty-state-greeting h1 {
+        font-size: 1.25rem;
+    }
+}
+
+/* ==========================================
+   BAN & SECURITY ALARM
+   ========================================== */
+
+/* Flash red background animation */
+@keyframes alarmFlash {
+    0% { background-color: #000000; }
+    50% { background-color: #8b0000; }
+    100% { background-color: #000000; }
+}
+
+body.banned-alarm {
+    animation: alarmFlash 0.6s infinite !important;
+}
+
+/* Ban Overlay Mockup */
+#ban-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    backdrop-filter: blur(8px);
+}
+
+#ban-overlay.active {
+    display: flex;
+}
+
+.ban-mockup {
+    background: #111;
+    border: 3px solid #ff2a2a;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+    max-width: 500px;
+    width: 90%;
+    animation: popupIn 0.3s ease;
+}
+
+.ban-title {
+    color: #ff2a2a;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.ban-desc {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+/* ==========================================
+   LIGHTBOX — MODAL FOTO PROFIL
+   ========================================== */
+.lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    backdrop-filter: blur(6px);
+    animation: lightboxFadeIn 0.25s ease;
+}
+
+@keyframes lightboxFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.lightbox.hidden {
+    display: none;
+}
+
+.lightbox-content {
+    max-width: 85vw;
+    max-height: 85vh;
+    border-radius: 16px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    object-fit: contain;
+    animation: lightboxZoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes lightboxZoomIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+.close-lightbox {
+    position: fixed;
+    top: 20px;
+    right: 28px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 2.5rem;
+    font-weight: 300;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s, transform 0.2s;
+    z-index: 100000;
+}
+
+.close-lightbox:hover {
+    color: #fff;
+    transform: scale(1.2) rotate(90deg);
+}

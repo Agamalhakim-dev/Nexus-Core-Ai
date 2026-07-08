@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Nexuscore ai</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+
+    <!-- Google Fonts: Inter & Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Utama -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- SheetJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Highlight.js (Syntax Highlighting VSCode Dark Theme) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+<body>
+
+{% if not user %}
+    <!-- ============================================== -->
+    <!-- HALAMAN LOGIN                                  -->
+    <!-- ============================================== -->
+    <div class="login-container">
+
+        <!-- VIDEO BACKGROUND — Taruh file video kamu di static/video/login-bg.mp4 -->
+        <video class="login-video-bg" autoplay loop muted playsinline>
+            <source src="{{ url_for('static', filename='video/video.mp4') }}" type="video/mp4">
+        </video>
+
+        <!-- Overlay gelap tipis supaya teks tetap terbaca -->
+        <div class="login-video-overlay"></div>
+
+        <div class="login-box">
+            <!-- Logo terpusat -->
+            <div class="login-logo-wrapper">
+                <img src="{{ url_for('static', filename='img/logo 2.png') }}" alt="AI Logo" class="login-logo">
+                <span class="login-logo-name">Nexuscore ai</span>
+            </div>
+            <h2>Selamat Datang di Nexuscore AI</h2>
+            <p>Silakan masuk menggunakan akun Anda untuk memulai percakapan cerdas tanpa batas.</p>
+            <span class="version-tag">v1.2.0</span>
+
+            <a href="/login" class="login-btn google-login">
+                <i class="fa-brands fa-google"></i> Masuk dengan Google
+            </a>
+            <a href="#" class="login-btn github-login" onclick="alert('Login GitHub sedang dalam pengembangan!'); return false;">
+                <i class="fa-brands fa-github"></i> Masuk dengan GitHub
+            </a>
+        </div>
+    </div>
+
+
+{% else %}
+    <!-- ============================================== -->
+    <!-- HALAMAN CHAT UTAMA                             -->
+    <!-- ============================================== -->
+    <div class="app-container">
+
+        <!-- Overlay saat sidebar HP terbuka -->
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebarMobile()"></div>
+
+        <!-- ─── SIDEBAR ─────────────────────────────── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <!-- Logo AI di Kiri -->
+                <div class="sidebar-logo">
+                    <img src="{{ url_for('static', filename='img/logo 2.png') }}" alt="Logo" style="height: 28px; width: auto; opacity: 0.9;">
+                </div>
+                
+                <!-- Toggle Sidebar (panel icon) di Kanan -->
+                <button class="close-sidebar-btn" id="close-sidebar-btn" onclick="toggleSidebar()" title="Buka/Tutup Sidebar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="session-list-container">
+                <!-- Aksi Tambahan di atas riwayat -->
+                <div class="sidebar-actions">
+                    <!-- Obrolan Baru (toggle-like button) -->
+                    <button class="action-list-btn" onclick="createNewSession()" title="Obrolan Baru">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <span>Obrolan baru</span>
+                        </div>
+                    </button>
+                    <!-- Tentang AI -->
+                    <button class="action-list-btn" onclick="toggleAboutAI()" title="Tentang AI">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>Tentang AI</span>
+                        </div>
+                    </button>
+                </div>
+                <div id="session-list">
+                    <!-- Riwayat obrolan dimuat via JS -->
+                </div>
+            </div>
+
+            <!-- ─── Profil Pengguna ─────────────────── -->
+            <div class="user-profile-sidebar" id="user-profile-sidebar">
+                <img src="{{ user.picture }}"
+                     alt="User Picture"
+                     class="user-avatar"
+                     onerror="this.src='https://ui-avatars.com/api/?name={{ user.name }}&background=random'">
+                <div class="user-info">
+                    <span class="user-name">{{ user.name }}</span>
+                    <span class="user-email">{{ user.email }}</span>
+                </div>
+
+                <!-- Tombol Pengaturan / Logout -->
+                <button class="settings-btn" id="settings-btn" title="Pengaturan & Keluar" onclick="toggleSettingsMenu()">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+
+                <!-- Popup Menu -->
+                <div class="settings-menu hidden" id="settings-menu">
+                    <div class="settings-menu-header">
+                        <img src="{{ user.picture }}"
+                             alt="User"
+                             class="menu-avatar"
+                             onerror="this.src='https://ui-avatars.com/api/?name={{ user.name }}&background=random'">
+                        <div class="menu-user-info">
+                            <span class="menu-user-name">{{ user.name }}</span>
+                            <span class="menu-user-email">{{ user.email }}</span>
+                        </div>
+                    </div>
+                    <div class="settings-menu-divider"></div>
+                    <a href="/logout" class="logout-link">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Kmu yakin ingin keluar?🙂
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ─── MAIN CHAT AREA ──────────────────────── -->
+        <main class="chat-area main-content" id="chat-area">
+
+            <!-- Header Chat -->
+            <header class="chat-header header">
+                <!-- Toggle Sidebar (Muncul saat sidebar tertutup) -->
+                <button class="header-toggle-btn" onclick="toggleSidebar()" title="Buka Riwayat Obrolan">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                </button>
+
+                <div class="header-logo">
+                    <img src="{{ url_for('static', filename='img/logo 2.png') }}" alt="AI Logo">
+                </div>
+                <div class="header-info">
+                    <h1>Nexuscore AI</h1>
+                </div>
+            </header>
+
+            <!-- Area Pesan -->
+            <div class="messages" id="chat-messages">
+                <!-- Chat dimuat oleh JavaScript -->
+            </div>
+
+            <!-- Typing Indicator -->
+            <div id="typing-indicator" class="typing-indicator hidden">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="chat-input-wrapper">
+                <!-- Preview File Terlampir -->
+                <div id="file-preview-container" class="file-preview-container hidden"></div>
+
+                <div class="chat-input-container">
+                    <!-- Baris Atas: Text Input -->
+                    <div class="chat-input-top-row">
+                        <textarea
+                            id="message-input"
+                            placeholder="Tanyakan Sesuatu"
+                            onkeydown="handleKeyDown(event)"
+                            rows="1"
+                        ></textarea>
+                    </div>
+
+                    <!-- Baris Bawah: Tools & Send Button -->
+                    <div class="chat-input-bottom-row">
+                        <div class="chat-input-tools-left">
+                            <!-- Tombol Upload File -->
+                            <label for="file-upload" class="upload-btn" title="Lampirkan File / Gambar / Folder">
+                                <i class="fa-solid fa-plus"></i>
+                            </label>
+                            <input type="file" id="file-upload" class="hidden-file-input" multiple>
+
+                            <!-- Model Selector (Pindah ke dalam box) -->
+                            <div class="model-selector-container">
+                                <button class="model-selector-btn" id="model-selector-btn" onclick="toggleModelMenu()" title="Pilih Model AI">
+                                    <span id="current-model-text">DeepSeek Reasoner</span> 
+                                    <i class="fa-solid fa-chevron-up"></i>
+                                </button>
+                                <!-- Popup Model Options -->
+                                <div class="model-menu hidden" id="model-menu">
+                                    <div class="model-option active" onclick="selectModel('default', 'DeepSeek Reasoner', this)">
+                                        <i class="fa-solid fa-brain"></i>
+                                        <div class="model-info">
+                                            <span class="model-name">DeepSeek Reasoner</span>
+                                            <span class="model-desc">Penalaran logika mendalam, matematika, & coding kompleks.</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-option" onclick="selectModel('gemini', 'Gemini 2.5 Flash', this)">
+                                        <i class="fa-brands fa-google"></i>
+                                        <div class="model-info">
+                                            <span class="model-name">Gemini 2.5 Flash</span>
+                                            <span class="model-desc">Respons super cepat, multimodal, & ditenagai Google [Google AI for Developers].</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-option" onclick="selectModel('codestral', 'Codestral (Mistral AI)')">
+                                        <div class="model-icon"><i class="fa-solid fa-code"></i></div>
+                                        <div class="model-info">
+                                            <span class="model-name">Codestral AI</span>
+                                            <span class="model-desc">Specialized AI for Coding</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-option" onclick="selectModel('glm', 'GLM-5.2 AI', this)">
+                                        <i class="fa-solid fa-brain"></i>
+                                        <div class="model-info">
+                                            <span class="model-name">GLM-5.2 AI</span>
+                                            <span class="model-desc">Model MoE tangguh untuk pemrosesan teks panjang.</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-option" onclick="selectModel('tabfm', 'TabFM API', this)">
+                                        <i class="fa-solid fa-table"></i>
+                                        <div class="model-info">
+                                            <span class="model-name">TabFM API</span>
+                                            <span class="model-desc">AI Google Research khusus prediksi data tabel & Excel.</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-option" onclick="selectModel('lightgbm', 'LightGBM', this)">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                        <div class="model-info">
+                                            <span class="model-name">LightGBM</span>
+                                            <span class="model-desc">Gradient Boosting Data</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-option" onclick="selectModel('catboost', 'CatBoost', this)">
+                                        <i class="fa-solid fa-cat"></i>
+                                        <div class="model-info">
+                                            <span class="model-name">CatBoost</span>
+                                            <span class="model-desc">Prediksi data tabel super cepat & hemat memori.</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-option" onclick="selectModel('xgboost', 'XGBoost', this)">
+                                        <i class="fa-solid fa-x-ray"></i>
+                                        <div class="model-info">
+                                            <span class="model-name">XGBoost</span>
+                                            <span class="model-desc">Jagonya analisis data tabel dengan banyak kolom teks.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input-tools-right">
+
+
+                            <!-- Tombol Kirim / Stop -->
+                            <button onclick="handleActionBtn()" class="send-btn" id="send-btn" title="Kirim Pesan">
+                                <i class="fa-solid fa-arrow-right" id="action-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- OVERLAY TENTANG AI                             -->
+    <!-- ============================================== -->
+    <div class="about-overlay hidden" id="about-overlay">
+        <div class="about-container">
+            <button class="close-about-btn" onclick="toggleAboutAI()" title="Tutup">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="about-profiles">
+                <div class="profile-card">
+                    <img src="{{ url_for('static', filename='img/profil.png') }}"
+                         alt="Developer"
+                         onclick="openLightbox(this.src)"
+                         style="cursor: zoom-in;"
+                         onerror="this.src='https://ui-avatars.com/api/?name={{ user.name }}&background=random'">
+                    <span class="profile-label">AI Engineering</span>
+                    <span class="profile-name">Agam Al Hakim Hasibuan</span>
+                </div>
+                <div class="profile-divider">
+                    <i class="fa-solid fa-handshake"></i>
+                </div>
+                <div class="profile-card">
+                    <img src="{{ url_for('static', filename='img/logo 2.png') }}" alt="AI">
+                    <span class="profile-label">AI Engine</span>
+                    <span class="profile-name">Nexuscore AI</span>
+                </div>
+            </div>
+            <div class="about-text">
+                <h3>Tentang Aplikasi Ini</h3>
+                <p>Nexuscore AI adalah asisten virtual tingkat lanjut yang dirancang untuk memberikan solusi cerdas, analisis mendalam, dan kecepatan pemrosesan kelas <em>enterprise</em>. Dibangun dengan dedikasi tinggi oleh <strong>Agam Sendiri</strong>, aplikasi ini mengintegrasikan teknologi <em>Large Language Model</em> super canggih untuk membantu pekerjaan sehari-harimu.</p>
+                <br>
+                <p><strong>🧠 Mesin Kecerdasan (API):</strong><br>
+                Ditenagai dengan API <em>hybrid</em> oleh <em>Gemini 2.5 Flash</em>,<em>DeepSeek Reasoner</em>,<em>Codestral</em>,<em>Claude ai</em>,<em>GLM-5.2</em>,<em>TabFM</em>,<em>LightGBM</em>,<em>CatBoost</em>,<em>XGBoost</em>,
+                
+                <strong>sumber API dari👇👇</strong>
+
+                <strong>google,Anthropic,Github,DeepSeek</strong>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container untuk Notifikasi Toast -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Pass User Name to JS -->
+    <script>
+        const CURRENT_USER_NAME = "{{ user.name }}";
+    </script>
+
+    <!-- Modal Image Lightbox -->
+    <div id="image-lightbox" class="lightbox hidden" onclick="closeLightbox()">
+        <span class="close-lightbox">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+
+    <!-- Script Utama -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <script>
+        // Toggle popup settings/logout
+        function toggleSettingsMenu() {
+            const menu = document.getElementById('settings-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Tutup menu jika klik di luar area profil
+        document.addEventListener('click', function(e) {
+            const profile = document.getElementById('user-profile-sidebar');
+            const menu    = document.getElementById('settings-menu');
+            if (profile && !profile.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+    </script>
+
+    <!-- Modal Ban Darurat -->
+    <div id="ban-overlay">
+        <div class="ban-mockup">
+            <h1 class="ban-title">WARNING ⛔⚠️</h1>
+            <p class="ban-desc">AKUN ANDA DI BANED SECARA PERMANEN OLEH NEXUSCORE AI</p>
+        </div>
+    </div>
+{% endif %}
+</body>
+</html>
