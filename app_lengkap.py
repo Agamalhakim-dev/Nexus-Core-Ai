@@ -39,11 +39,14 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "super_rahasia_default")
-app.permanent_session_lifetime = timedelta(days=30)  # Sesi login bertahan 30 hari
+app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET_KEY", "super_rahasia_default")
+app.config['SESSION_COOKIE_NAME'] = 'google-login-session'
+app.config['PREFERRED_URL_SCHEME'] = 'https'
 
-# Izinkan OAuth di localhost (http) — hanya untuk development
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+app.permanent_session_lifetime = timedelta(days=30)
+
+if "localhost" in os.environ.get("VERCEL_URL", "") or not os.environ.get("VERCEL"):
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 # ============================================================================
 # SECTION 3: OAUTH GOOGLE
