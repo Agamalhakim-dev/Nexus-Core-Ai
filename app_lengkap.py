@@ -675,11 +675,11 @@ def chat():
                     completion = client.chat.completions.create(model="gemini-2.5-flash", messages=ai_messages, temperature=0.3, stream=True)
 
                 else:
-                    # Default: DeepSeek via OpenRouter (Perbaikan model reguer)
-                    or_model = "deepseek/deepseek-chat"
+                    # Default: Gemini 2.5 Flash (cepat & gratis)
+                    gemini_key = os.environ.get("GOOGLE_API_KEY")
                     ai_messages.append({"role": "user", "content": openai_msg_content})
-                    client = get_openrouter_client()
-                    completion = client.chat.completions.create(model=or_model, messages=ai_messages, temperature=0.7, stream=True)
+                    client = OpenAI(api_key=gemini_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
+                    completion = client.chat.completions.create(model="gemini-2.5-flash", messages=ai_messages, temperature=0.7, stream=True)
 
                 full_response = ""
                 for chunk in completion:
@@ -914,10 +914,11 @@ def chat_regenerate():
                     completion = client.chat.completions.create(model="gemini-2.5-flash", messages=ai_messages, temperature=0.3, stream=True)
 
                 else:
-                    or_model = "deepseek/deepseek-chat"
+                    # Default: Gemini 2.5 Flash (cepat & gratis)
+                    gemini_key = os.environ.get("GOOGLE_API_KEY")
                     ai_messages.append({"role": "user", "content": openai_msg_content})
-                    client = get_openrouter_client()
-                    completion = client.chat.completions.create(model=or_model, messages=ai_messages, temperature=0.7, stream=True)
+                    client = OpenAI(api_key=gemini_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
+                    completion = client.chat.completions.create(model="gemini-2.5-flash", messages=ai_messages, temperature=0.7, stream=True)
 
                 full_response = ""
                 for chunk in completion:
