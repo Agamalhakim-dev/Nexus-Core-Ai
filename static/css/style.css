@@ -600,70 +600,71 @@ img, svg {
 .message.assistant .text p:last-child {
     margin-bottom: 0;
 }
-.message.assistant .text pre {
-    background: #000;
-    padding: 12px;
-    border-radius: 8px;
-    overflow-x: auto;
-    margin: 0;
-}
 
-/* Wrapper Khusus Kodingan */
-.code-block-wrapper {
-    position: relative;
-    margin: 15px 0;
-    background: #000;
-    border-radius: 8px;
+/* Canvas Kode Baru (Custom Renderer) */
+.code-canvas {
+    background: #0d0d0d;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 36px; /* Ruang untuk header bahasa di atas */
+    border-radius: 8px;
+    margin: 15px 0;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Label Bahasa Pemrograman di Kiri Atas */
-.code-block-wrapper::before {
-    content: attr(data-language);
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-secondary);
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.code-lang {
+    color: #a0a0a0;
     font-size: 0.75rem;
-    padding: 4px 12px;
-    border-bottom-left-radius: 8px;
-    border-top-right-radius: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    pointer-events: none;
+    font-weight: 600;
 }
 
-/* Beri ruang ekstra di bawah agar kode tidak tertutup tombol Salin */
-.code-block-wrapper pre {
-    margin: 0;
-    border: none;
-    padding-bottom: 45px; /* Ruang untuk tombol copy di bawah */
-}
-
-/* Tombol Salin Khusus Kodingan di Pojok Kanan Bawah */
-.code-copy-btn {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
+.copy-btn {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
-    padding: 0;
+    color: #a0a0a0;
     font-size: 0.8rem;
     cursor: pointer;
-    transition: color 0.2s ease;
     display: flex;
     align-items: center;
     gap: 6px;
-    z-index: 10;
+    transition: all 0.2s ease;
+    padding: 4px 8px;
+    border-radius: 4px;
 }
 
-.code-copy-btn:hover {
-    background: transparent;
-    color: var(--text-primary);
+.copy-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
 }
+
+.copy-btn.copied {
+    color: #4CAF50;
+}
+
+.code-canvas pre {
+    margin: 0;
+    padding: 12px;
+    overflow-x: auto;
+    background: transparent !important;
+}
+
+.code-canvas code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    background: transparent !important;
+}
+
 .message.assistant .text code {
     font-family: monospace;
     background: rgba(0,0,0,0.3);

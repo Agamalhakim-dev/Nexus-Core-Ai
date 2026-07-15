@@ -521,11 +521,25 @@ def chat():
 
         safe_log(f"[Chat] Pesan user: {user_message}")
 
-        # --- Build system prompt ---
-        system_prompt = BASE_SYSTEM_PROMPT
+        # --- Build system prompt berdasarkan Persona ---
+        persona = data.get("persona", "standard")
+        if persona == "programmer":
+            system_prompt = "You are an elite expert programmer and software architect. Answer questions with precise code, clean architecture, and best practices. Avoid long non-technical explanations.\n\n"
+        elif persona == "santai":
+            system_prompt = "Kamu adalah asisten gaul dan santai. Jawab dengan gaya bahasa gaul, luwes, dan seperti ngobrol santai sama teman (bisa pakai emoji). Hindari bahasa kaku.\n\n"
+        else:
+            system_prompt = BASE_SYSTEM_PROMPT
         
-        # --- Deteksi Niat User untuk Pencarian Web (DINONAKTIFKAN - menyebabkan respon lambat) ---
-        # Fitur pencarian web otomatis dinonaktifkan agar AI tetap cepat.
+        # --- Deteksi Web Search Manual ---
+        web_search = data.get("web_search", False)
+        if web_search and raw_query:
+            google_ctx = get_google_context(raw_query)
+            if google_ctx:
+                system_prompt += google_ctx
+            else:
+                wiki_ctx = get_wikipedia_context(raw_query)
+                if wiki_ctx:
+                    system_prompt += wiki_ctx
 
         # --- Build message history for AI (OpenAI format) ---
         ai_messages = [{"role": "system", "content": system_prompt}]
@@ -761,12 +775,27 @@ def chat_regenerate():
 
         safe_log(f"[Regenerate] Pesan user: {user_message}")
 
-        # --- Build system prompt ---
-        system_prompt = BASE_SYSTEM_PROMPT
+        # --- Build system prompt berdasarkan Persona ---
+        persona = data.get("persona", "standard")
+        if persona == "programmer":
+            system_prompt = "You are an elite expert programmer and software architect. Answer questions with precise code, clean architecture, and best practices. Avoid long non-technical explanations.\n\n"
+        elif persona == "santai":
+            system_prompt = "Kamu adalah asisten gaul dan santai. Jawab dengan gaya bahasa gaul, luwes, dan seperti ngobrol santai sama teman (bisa pakai emoji). Hindari bahasa kaku.\n\n"
+        else:
+            system_prompt = BASE_SYSTEM_PROMPT
         
-        # --- Deteksi Niat User untuk Pencarian Web (Intent Detection) ---
-        # --- Deteksi Niat User untuk Pencarian Web (DINONAKTIFKAN - menyebabkan respon lambat) ---
-        # Fitur pencarian web otomatis dinonaktifkan agar AI tetap cepat.
+        # --- Deteksi Web Search Manual ---
+        web_search = data.get("web_search", False)
+        if web_search:
+            raw_query = new_message if new_message else " ".join([m["content"] for m in session_data["messages"] if m["role"] == "user"])
+            if raw_query:
+                google_ctx = get_google_context(raw_query)
+                if google_ctx:
+                    system_prompt += google_ctx
+                else:
+                    wiki_ctx = get_wikipedia_context(raw_query)
+                    if wiki_ctx:
+                        system_prompt += wiki_ctx
 
         # --- Build message history for AI (OpenAI format) ---
         ai_messages = [{"role": "system", "content": system_prompt}]

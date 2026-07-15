@@ -1,6 +1,65 @@
 let currentSessionId = null;
 let pendingFiles = [];
 let currentModel = "default";
+let isWebSearchEnabled = false;
+let currentPersona = "standard";
+
+// Konfigurasi Custom Renderer untuk Marked.js (Canvas Kode)
+const renderer = new marked.Renderer();
+renderer.code = function(code, language) {
+    const validLang = !!(language && hljs.getLanguage(language));
+    const langLabel = validLang ? language : 'Code';
+    const highlighted = validLang ? hljs.highlight(code, { language }).value : hljs.highlightAuto(code).value;
+    
+    // Generate ID unik untuk fungsi copy
+    const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
+    
+    return `
+    <div class="code-canvas">
+        <div class="code-header">
+            <span class="code-lang">${langLabel}</span>
+            <button class="copy-btn" onclick="copyCodeToClipboard('${codeId}', this)">
+                <i class="fa-regular fa-copy"></i> Copy
+            </button>
+        </div>
+        <pre><code id="${codeId}" class="hljs ${language}">${highlighted}</code></pre>
+    </div>
+    `;
+};
+marked.setOptions({
+    renderer: renderer,
+    highlight: function(code, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+            return hljs.highlight(code, { language: lang }).value;
+        }
+        return hljs.highlightAuto(code).value;
+    }
+});
+
+// Fungsi untuk menyalin kode
+window.copyCodeToClipboard = function(codeId, btnElement) {
+    const codeElement = document.getElementById(codeId);
+    if (!codeElement) return;
+    
+    // Fallback copy approach
+    const textArea = document.createElement("textarea");
+    textArea.value = codeElement.innerText || codeElement.textContent;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        const originalText = btnElement.innerHTML;
+        btnElement.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+        btnElement.classList.add('copied');
+        setTimeout(() => {
+            btnElement.innerHTML = originalText;
+            btnElement.classList.remove('copied');
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy', err);
+    }
+    document.body.removeChild(textArea);
+};
 
 // Toggle Model Menu
 function toggleModelMenu() {
@@ -628,9 +687,11 @@ function sendMessage() {
     const payload = { 
         message: combinedMessage,
         ui_message: uiDisplayMessage,
-        raw_query: rawMessage, // Query murni untuk mesin pencari web
+        raw_query: rawMessage,
         images: imagesPayload,
-        model: currentModel
+        model: currentModel,
+        web_search: isWebSearchEnabled,
+        persona: currentPersona
     };
     
     if (currentSessionId) {
@@ -932,50 +993,7 @@ function displayMessage(text, sender, isHtml = false, rawText = "", attachments 
     
     messageDiv.innerHTML = innerContent;
     
-    // Tambahkan tombol copy khusus untuk blok kode (sintaks koding)
-    if (isHtml) {
-        const preBlocks = messageDiv.querySelectorAll('pre');
-        preBlocks.forEach(pre => {
-            // Bungkus pre dengan div relative
-            const wrapper = document.createElement('div');
-            wrapper.className = 'code-block-wrapper';
-            
-            // Ambil nama bahasa pemrograman jika ada
-            let langName = "code";
-            const codeEl = pre.querySelector('code');
-            if (codeEl) {
-                const langClass = Array.from(codeEl.classList).find(cls => cls.startsWith('language-'));
-                if (langClass) {
-                    langName = langClass.replace('language-', '');
-                }
-            }
-            wrapper.setAttribute('data-language', langName);
-            
-            // Ambil teks kodingan
-            const codeText = pre.innerText;
-            const encodedCode = encodeURIComponent(codeText);
-            
-            // Buat tombol Salin Code
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'code-copy-btn';
-            copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Salin Code';
-            copyBtn.onclick = function() {
-                copyText(this, encodedCode);
-            };
-            
-            // Sisipkan ke DOM
-            pre.parentNode.insertBefore(wrapper, pre);
-            wrapper.appendChild(pre);
-            wrapper.appendChild(copyBtn);
-            
-            // Terapkan Syntax Highlighting mirip VSCode
-            if (codeEl) {
-                // Hapus warna background bawaan supaya mengikuti tema VSCode
-                codeEl.style.background = 'transparent';
-                hljs.highlightElement(codeEl);
-            }
-        });
-    }
+    // Blok kustom kode telah dihapus karena sekarang ditangani langsung oleh renderer marked.js
 
     messagesContainer.appendChild(messageDiv);
     
@@ -1294,7 +1312,9 @@ function triggerRegenerate(messageIndex, newText) {
         session_id: currentSessionId,
         message_index: messageIndex,
         new_message: newText,
-        model: currentModel
+        model: currentModel,
+        web_search: isWebSearchEnabled,
+        persona: currentPersona
     };
     
     const sessionIdForThisRequest = currentSessionId;
@@ -1388,3 +1408,51 @@ function triggerRegenerate(messageIndex, newText) {
         currentAbortController = null;
     });
 }
+
+// --- FITUR BARU: Web Search, Persona, & Export ---
+function toggleWebSearch() {
+    isWebSearchEnabled = !isWebSearchEnabled;
+    const btn = document.getElementById('web-search-toggle');
+    if (isWebSearchEnabled) {
+        btn.style.color = '#4CAF50';
+        btn.innerHTML = '<i class=\"fa-solid fa-globe\"></i> <span style=\"font-size:0.7rem; font-family:sans-serif;\">ON</span>';
+    } else {
+        btn.style.color = '#888';
+        btn.innerHTML = '<i class=\"fa-solid fa-globe\"></i>';
+    }
+}
+
+function changePersona(persona) {
+    currentPersona = persona;
+}
+
+function exportChat() {
+    const messages = document.querySelectorAll('.message .text');
+    if (messages.length === 0) {
+        alert('Tidak ada percakapan untuk di-export.');
+        return;
+    }
+
+    let exportContent = '# Nexus Core AI Chat Export\\n\\n';
+    
+    document.querySelectorAll('.message').forEach(msgDiv => {
+        const isUser = msgDiv.classList.contains('user');
+        const sender = isUser ? 'You' : 'Nexuscore AI';
+        // Ambil teks original jika ada di attribut data-original-content, jika tidak ambil innerText
+        const textElement = msgDiv.querySelector('.text');
+        const rawContent = textElement.getAttribute('data-original-content') || textElement.innerText;
+        
+        exportContent += \### \\\n\\\n\\n---\\n\\n\;
+    });
+
+    const blob = new Blob([exportContent], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = \NexusCoreAI_Chat_\.md\;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
