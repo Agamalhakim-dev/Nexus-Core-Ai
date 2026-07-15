@@ -524,21 +524,8 @@ def chat():
         # --- Build system prompt ---
         system_prompt = BASE_SYSTEM_PROMPT
         
-        # --- Deteksi Niat User untuk Pencarian Web (Intent Detection) ---
-        if raw_query and not images and len(raw_query) > 5:
-            query_lower = raw_query.lower()
-            search_keywords = ["berita", "terbaru", "hari ini", "sumber", "referensi", "artikel", "cari", "google", "siapa", "kapan", "dimana"]
-            
-            # Jika ada kata kunci pencarian, panggil Google Search
-            if any(kw in query_lower for kw in search_keywords):
-                google_ctx = get_google_context(raw_query)
-                if google_ctx:
-                    system_prompt += google_ctx
-                else:
-                    # Fallback ke Wikipedia jika Google gagal / kosong
-                    wiki_ctx = get_wikipedia_context(raw_query)
-                    if wiki_ctx:
-                        system_prompt += wiki_ctx
+        # --- Deteksi Niat User untuk Pencarian Web (DINONAKTIFKAN - menyebabkan respon lambat) ---
+        # Fitur pencarian web otomatis dinonaktifkan agar AI tetap cepat.
 
         # --- Build message history for AI (OpenAI format) ---
         ai_messages = [{"role": "system", "content": system_prompt}]
@@ -778,18 +765,8 @@ def chat_regenerate():
         system_prompt = BASE_SYSTEM_PROMPT
         
         # --- Deteksi Niat User untuk Pencarian Web (Intent Detection) ---
-        if raw_query and not images and len(raw_query) > 5:
-            query_lower = raw_query.lower()
-            search_keywords = ["berita", "terbaru", "hari ini", "sumber", "referensi", "artikel", "cari", "google", "siapa", "kapan", "dimana"]
-            
-            if any(kw in query_lower for kw in search_keywords):
-                google_ctx = get_google_context(raw_query)
-                if google_ctx:
-                    system_prompt += google_ctx
-                else:
-                    wiki_ctx = get_wikipedia_context(raw_query)
-                    if wiki_ctx:
-                        system_prompt += wiki_ctx
+        # --- Deteksi Niat User untuk Pencarian Web (DINONAKTIFKAN - menyebabkan respon lambat) ---
+        # Fitur pencarian web otomatis dinonaktifkan agar AI tetap cepat.
 
         # --- Build message history for AI (OpenAI format) ---
         ai_messages = [{"role": "system", "content": system_prompt}]

@@ -727,5 +727,25 @@
         "timestamp": "2026-07-14T15:44:44.257495"
       }
     ]
+  },
+  {
+    "id": "90ab58a8-fbb0-43ff-8b14-d63a620ef75a",
+    "user_email": "guest_8537417b@nexuscore.local",
+    "title": "holaaa",
+    "created_at": "2026-07-15T14:17:22.673092",
+    "updated_at": "2026-07-15T14:17:51.568688",
+    "messages": [
+      {
+        "role": "user",
+        "content": "holaaa",
+        "timestamp": "2026-07-15T14:17:22.674151",
+        "images": []
+      },
+      {
+        "role": "assistant",
+        "content": "Halo! Selamat datang. Senang sekali Anda menyapa.\n\nAda yang bisa Nexuscore bantu hari ini? Jangan sungkan untuk menyampaikan apa pun yang Anda butuhkan, saya siap membantu.",
+        "timestamp": "2026-07-15T14:17:51.568688"
+      }
+    ]
   }
 ]
