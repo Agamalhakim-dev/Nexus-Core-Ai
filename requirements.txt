@@ -3,4 +3,5 @@ requests
 groq
 python-dotenv
 openai
-google-generativeaigooglesearch-python
+google-generativeai
+googlesearch-python
