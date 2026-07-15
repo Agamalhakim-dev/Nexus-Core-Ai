@@ -62,26 +62,26 @@
         <!-- Overlay gelap tipis supaya teks tetap terbaca -->
         <div class="login-video-overlay"></div>
 
-        <div class="login-box" style="max-width:750px; flex-direction: row; align-items: center; gap: 40px; padding: 40px;">
+        <div class="login-box">
             <!-- KIRI: Logo + Teks -->
-            <div class="login-left" style="flex:1; text-align:left;">
-                <div class="login-logo-wrapper" style="justify-content:flex-start; margin-bottom:16px;">
-                    <img src="{{ url_for('static', filename='img/logo 2.png') }}" alt="AI Logo" class="login-logo">
-                    <span class="login-logo-name">Nexuscore ai</span>
+            <div class="login-left">
+                <div class="login-logo-wrapper">
+                    <img src="{{ url_for('static', filename='img/logo 2.png') }}" alt="AI Logo" class="login-logo" style="width:55px; height:55px; margin:0;">
+                    <span class="login-logo-name" style="font-size:1rem;">Nexuscore ai</span>
                 </div>
-                <h2 style="font-size:1.6rem; margin-bottom:10px;">Selamat Datang di<br>Nexuscore AI</h2>
-                <p style="color:#aaa; margin-bottom:16px;">Silakan masuk menggunakan akun Anda untuk memulai percakapan cerdas tanpa batas.</p>
+                <h2>Selamat Datang di<br>Nexuscore AI</h2>
+                <p>Silakan masuk menggunakan akun Anda untuk memulai percakapan cerdas tanpa batas.</p>
                 <span class="version-tag">v1.2.0</span>
             </div>
 
             <!-- DIVIDER -->
-            <div style="width:1px; background:rgba(255,255,255,0.15); align-self:stretch; min-height:180px;"></div>
+            <div class="login-divider"></div>
 
             <!-- KANAN: QR Code -->
-            <div class="login-right" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:12px;">
-                <p style="font-size:0.85em; color:#aaa; margin:0;">Scan QR Code menggunakan HP untuk masuk</p>
-                <div id="qrcode-container" style="padding: 10px; background: white; border-radius: 12px; display:flex; justify-content:center; align-items:center; width:160px; height:160px;"></div>
-                <p id="qr-status-msg" style="font-size: 0.8em; color: #888; margin:0;">Mengarahkan HP ke jaringan lokal yang sama</p>
+            <div class="login-right">
+                <p style="font-size:0.8em; color:#aaa; margin:0; text-align:center;">Scan QR menggunakan<br>HP untuk masuk</p>
+                <div id="qrcode-container" style="padding:10px; background:white; border-radius:12px; width:160px; height:160px; display:flex; justify-content:center; align-items:center;"></div>
+                <p id="qr-status-msg" style="font-size:0.75em; color:#777; margin:0; text-align:center;">Pastikan HP di jaringan Wi-Fi yang sama</p>
             </div>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
             <script>
