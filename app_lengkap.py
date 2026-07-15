@@ -282,40 +282,78 @@ def check_banned_user():
 def banned_page():
     return "<h1>AKUN ANDA TELAH DIBLOKIR PERMANEN OLEH NEXUSCORE AI</h1><p>Pelanggaran keamanan tingkat berat terdeteksi.</p>", 403
 
+PENDING_LOGINS = {}
+
 @app.route("/")
 def index():
     user = session.get("user")
     return render_template("index.html", user=user)
 
+import socket
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
-@app.route("/login")
-def login():
-    if request.host.startswith("localhost") or request.host.startswith("127.0.0.1") or "10." in request.host:
-        redirect_uri = "http://localhost:5000/auth/callback"
-    else:
-        redirect_uri = url_for("auth_callback", _external=True)
-        
-    # Hapus sesi lama sebelum login baru agar akun yang dipilih tidak terkontaminasi cache
-    session.clear()
-    return google.authorize_redirect(redirect_uri, prompt="select_account")
+@app.route("/api/auth/qrcode")
+def auth_qrcode():
+    # Buat session ID unik untuk QR Code
+    sid = uuid.uuid4().hex
+    PENDING_LOGINS[sid] = None
+    # Bersihkan memory (opsional) untuk id lama
+    if len(PENDING_LOGINS) > 1000:
+        PENDING_LOGINS.clear()
+        PENDING_LOGINS[sid] = None
+    return jsonify({"session_id": sid, "local_ip": get_local_ip()})
 
-
-@app.route("/auth/callback")
-def auth_callback():
-    token = google.authorize_access_token()
-    user_info = token.get("userinfo")
-    if not user_info:
-        resp = google.get("https://www.googleapis.com/oauth2/v1/userinfo")
-        user_info = resp.json()
+@app.route("/api/auth/status")
+def auth_status():
+    sid = request.args.get("sid")
+    if not sid:
+        return jsonify({"success": False})
     
-    session.permanent = True
+    user_data = PENDING_LOGINS.get(sid)
+    if user_data:
+        session["user"] = user_data
+        session.permanent = True
+        del PENDING_LOGINS[sid]
+        return jsonify({"success": True})
     
-    banned_list = load_banned_users()
-    if user_info.get("email") in banned_list:
-        return redirect("/banned_page")
+    return jsonify({"success": False})
+
+@app.route("/mobile-login")
+def mobile_login():
+    sid = request.args.get("sid")
+    if sid:
+        # Buat identitas Guest
+        guest_id = str(uuid.uuid4())[:8]
+        user_info = {
+            "email": f"guest_{guest_id}@nexuscore.local",
+            "name": f"Guest {guest_id}",
+            "picture": "https://ui-avatars.com/api/?name=Guest&background=random",
+            "is_guest": True
+        }
         
-    session["user"] = user_info
-    return redirect("/")
+        # Langsung otorisasi sesi
+        PENDING_LOGINS[sid] = user_info
+        return """
+        <html>
+        <head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+        <body style="background:#1e1e2e; color:white; font-family:sans-serif; text-align:center; padding-top:50px;">
+            <h2>✅ Berhasil!</h2>
+            <p>Silakan lihat layar komputer Anda.<br>Anda sudah masuk sebagai Guest.</p>
+            <p style="color:#aaa; font-size:0.8em; margin-top:20px;">Halaman ini bisa ditutup.</p>
+        </body>
+        </html>
+        """
+    return "Invalid session", 400
+
 
 
 @app.route("/logout")
@@ -919,3 +957,4 @@ def chat_regenerate():
 if __name__ == "__main__":
     os.makedirs(DATA_DIR, exist_ok=True)
     app.run(debug=True, use_reloader=False, host="0.0.0.0", port=5000)
+

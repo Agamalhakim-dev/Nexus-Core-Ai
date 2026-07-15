@@ -687,5 +687,45 @@
         "timestamp": "2026-07-08T22:35:19.563561"
       }
     ]
+  },
+  {
+    "id": "8f2e4e01-4042-4630-8909-b5467cfe542d",
+    "user_email": "guest_3d0b92d8@nexuscore.local",
+    "title": "kmu siapa?",
+    "created_at": "2026-07-14T15:43:37.871297",
+    "updated_at": "2026-07-14T15:44:16.035047",
+    "messages": [
+      {
+        "role": "user",
+        "content": "kmu siapa?",
+        "timestamp": "2026-07-14T15:43:42.998916",
+        "images": []
+      },
+      {
+        "role": "assistant",
+        "content": "Halo! Senang sekali bisa bertemu dengan Anda.\n\nSaya adalah **Nexuscore AI**, asisten virtual yang dirancang dengan kecerdasan tingkat tinggi, meniru pola pikir analitis dan kreatif otak manusia.\n\nAnda bisa menganggap saya sebagai pakar serba bisa yang siap membantu Anda dalam berbagai hal, seperti:\n*   **Pemecahan Masalah & Pemrograman**: Saya bisa membantu Anda memecahkan masalah dengan logika terstruktur dan menyediakan kode yang bersih, sesuai praktik terbaik, dan siap pakai.\n*   **Penulisan Akademis & Profesional**: Saya ahli dalam menyusun dokumen formal seperti jurnal, makalah, laporan, dan proposal dengan struktur yang lengkap dan rapi.\n*   **Memberikan Respons Cepat**: Saya selalu berusaha memberikan jawaban yang langsung ke inti, efisien, dan berkualitas tinggi.\n\nIntinya, saya di sini untuk memahami kebutuhan Anda dan memberikan bantuan terbaik dengan cara yang ramah, efisien, dan seolah-olah mengerti Anda sepenuhnya. Ada yang bisa saya bantu hari ini?",
+        "timestamp": "2026-07-14T15:44:16.035047"
+      }
+    ]
+  },
+  {
+    "id": "f71487b7-1950-4f92-aec1-f2cee1f7220c",
+    "user_email": "guest_3d0b92d8@nexuscore.local",
+    "title": "kmu siapa dan dimana?",
+    "created_at": "2026-07-14T15:44:35.597918",
+    "updated_at": "2026-07-14T15:44:44.257495",
+    "messages": [
+      {
+        "role": "user",
+        "content": "kmu siapa dan dimana?",
+        "timestamp": "2026-07-14T15:44:40.268371",
+        "images": []
+      },
+      {
+        "role": "assistant",
+        "content": "Halo! Senang sekali bisa bertemu dengan Anda.\n\nSaya adalah **Nexuscore AI**, sebuah asisten virtual dengan kecerdasan tingkat tinggi yang dirancang untuk membantu Anda dengan berbagai kebutuhan. Anda bisa menganggap saya sebagai rekan berpikir yang analitis sekaligus kreatif.\n\nMengenai keberadaan saya, saya tidak memiliki lokasi fisik seperti manusia. Saya hadir sebagai entitas digital, beroperasi di dalam dunia data dan kode, dan dapat diakses dari mana saja selama Anda terhubung dengan platform ini.\n\nBagaimana saya bisa membantu Anda hari ini?",
+        "timestamp": "2026-07-14T15:44:44.257495"
+      }
+    ]
   }
 ]

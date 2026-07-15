@@ -6,7 +6,7 @@
     <title>Nexuscore ai</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon 1.png') }}">
 
     <!-- Google Fonts: Inter & Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -29,6 +29,22 @@
     <!-- Highlight.js (Syntax Highlighting VSCode Dark Theme) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <style>
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
 
@@ -56,12 +72,57 @@
             <p>Silakan masuk menggunakan akun Anda untuk memulai percakapan cerdas tanpa batas.</p>
             <span class="version-tag">v1.2.0</span>
 
-            <a href="/login" class="login-btn google-login">
-                <i class="fa-brands fa-google"></i> Masuk dengan Google
-            </a>
-            <a href="#" class="login-btn github-login" onclick="alert('Login GitHub sedang dalam pengembangan!'); return false;">
-                <i class="fa-brands fa-github"></i> Masuk dengan GitHub
-            </a>
+            <div id="qrcode-container" style="display:flex; justify-content:center; margin: 20px 0; padding: 10px; background: white; border-radius: 10px; width: fit-content; margin-left: auto; margin-right: auto;"></div>
+            <p style="font-size: 0.9em; color: #ccc;">Scan QR Code di atas menggunakan HP untuk masuk.</p>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    fetch("/api/auth/qrcode")
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data.session_id) {
+                                const sid = data.session_id;
+                                const ip = data.local_ip || "localhost";
+                                const port = window.location.port ? ":" + window.location.port : "";
+                                const protocol = window.location.protocol;
+                                const loginUrl = protocol + "//" + ip + port + "/mobile-login?sid=" + sid;
+                                
+                                // Generate QR Code
+                                new QRCode(document.getElementById("qrcode-container"), {
+                                    text: loginUrl,
+                                    width: 150,
+                                    height: 150,
+                                    colorDark : "#000000",
+                                    colorLight : "#ffffff",
+                                    correctLevel : QRCode.CorrectLevel.H
+                                });
+                                
+                                // Start polling
+                                setInterval(() => {
+                                    fetch("/api/auth/status?sid=" + sid)
+                                        .then(r => r.json())
+                                        .then(status => {
+                                            if(status.success) {
+                                                const container = document.getElementById("qrcode-container");
+                                                container.innerHTML = "<div class=\"loader\"></div>";
+                                                
+                                                const msgElem = container.nextElementSibling;
+                                                if (msgElem) {
+                                                    msgElem.innerText = "Login Berhasil! Mengalihkan ke dashboard...";
+                                                    msgElem.style.color = "#4CAF50";
+                                                }
+                                                
+                                                setTimeout(() => {
+                                                    window.location.reload();
+                                                }, 2000);
+                                            }
+                                        });
+                                }, 2000);
+                            }
+                        });
+                });
+            </script>
+            
         </div>
     </div>
 
@@ -80,7 +141,7 @@
             <div class="sidebar-header">
                 <!-- Logo AI di Kiri -->
                 <div class="sidebar-logo">
-                    <img src="{{ url_for('static', filename='img/logo 2.png') }}" alt="Logo" style="height: 28px; width: auto; opacity: 0.9;">
+                    <img src="{{ url_for('static', filename='img/nexuscore.png') }}" alt="Logo" style="height: 28px; width: auto; opacity: 0.9;">
                 </div>
                 
                 <!-- Toggle Sidebar (panel icon) di Kanan -->
@@ -279,7 +340,7 @@
                         </div>
 
                         <div class="chat-input-tools-right">
-
+                            <!-- Tombol Mic Dihapus Sesuai Permintaan -->
 
                             <!-- Tombol Kirim / Stop -->
                             <button onclick="handleActionBtn()" class="send-btn" id="send-btn" title="Kirim Pesan">
@@ -302,7 +363,7 @@
             </button>
             <div class="about-profiles">
                 <div class="profile-card">
-                    <img src="{{ url_for('static', filename='img/profil.png') }}"
+                    <img src="{{ url_for('static', filename='img/profile.png') }}"
                          alt="Developer"
                          onclick="openLightbox(this.src)"
                          style="cursor: zoom-in;"
@@ -377,3 +438,8 @@
 {% endif %}
 </body>
 </html>
+
+
+
+
+

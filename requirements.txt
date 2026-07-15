@@ -4,4 +4,3 @@ groq
 python-dotenv
 openai
 google-generativeai
-authlib
