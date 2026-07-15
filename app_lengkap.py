@@ -22,8 +22,7 @@ import requests
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from openai import OpenAI
 from dotenv import load_dotenv
-from authlib.integrations.flask_client import OAuth
-from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 # Import googlesearch
 try:
@@ -45,21 +44,12 @@ app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 app.permanent_session_lifetime = timedelta(days=30)
 
-if "localhost" in os.environ.get("VERCEL_URL", "") or not os.environ.get("VERCEL"):
-    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
 
 # ============================================================================
 # SECTION 3: OAUTH GOOGLE
 # ============================================================================
 
-oauth = OAuth(app)
-google = oauth.register(
-    name='google',
-    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
-    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={'scope': 'openid email profile'}
-)
 
 # ============================================================================
 # SECTION 4: OPENROUTER CLIENT (Free, supports DeepSeek + Qwen + many models)

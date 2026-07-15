@@ -1415,7 +1415,7 @@ function toggleWebSearch() {
     const btn = document.getElementById('web-search-toggle');
     if (isWebSearchEnabled) {
         btn.style.color = '#4CAF50';
-        btn.innerHTML = '<i class=\"fa-solid fa-globe\"></i> <span style=\"font-size:0.7rem; font-family:sans-serif;\">ON</span>';
+        btn.innerHTML = '<i class="fa-solid fa-globe"></i> <span style="font-size:0.7rem; font-family:sans-serif;">ON</span>';
     } else {
         btn.style.color = '#888';
         btn.innerHTML = '<i class=\"fa-solid fa-globe\"></i>';
@@ -1442,14 +1442,14 @@ function exportChat() {
         const textElement = msgDiv.querySelector('.text');
         const rawContent = textElement.getAttribute('data-original-content') || textElement.innerText;
         
-        exportContent += \### \\\n\\\n\\n---\\n\\n\;
+        exportContent += `### ${sender}\n${rawContent}\n\n---\n\n`;
     });
 
     const blob = new Blob([exportContent], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = \NexusCoreAI_Chat_\.md\;
+    a.download = `NexusCoreAI_Chat_${new Date().getTime()}.md`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
