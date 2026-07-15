@@ -180,6 +180,22 @@
                             <span>Tentang AI</span>
                         </div>
                     </button>
+                    <!-- AI Persona Selector (Dipindah ke Sidebar) -->
+                    <div style="padding: 10px 15px;">
+                        <span style="font-size: 0.75rem; color: #888; display: block; margin-bottom: 5px; text-transform: uppercase;">Persona AI</span>
+                        <select id="persona-select" onchange="changePersona(this.value)" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ddd; padding: 8px 10px; border-radius: 6px; outline: none; cursor: pointer; font-size: 0.85rem; appearance: auto;">
+                            <option value="standard" style="background: #1e1e1e; color: white;">🤖 Asisten Standard</option>
+                            <option value="programmer" style="background: #1e1e1e; color: white;">💻 Programmer</option>
+                            <option value="santai" style="background: #1e1e1e; color: white;">😎 Gaya Santai</option>
+                        </select>
+                    </div>
+                    <!-- Export Chat Button (Dipindah ke Sidebar) -->
+                    <button class="action-list-btn" onclick="exportChat()" title="Download Percakapan">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Export Percakapan</span>
+                        </div>
+                    </button>
                 </div>
                 <div id="session-list">
                     <!-- Riwayat obrolan dimuat via JS -->
@@ -243,22 +259,6 @@
                     <div class="header-info">
                         <h1>Nexuscore AI</h1>
                     </div>
-                </div>
-                
-                <div class="header-actions" style="display: flex; align-items: center; gap: 15px;">
-                    <!-- AI Persona Selector -->
-                    <div class="persona-selector" style="position: relative;">
-                        <select id="persona-select" onchange="changePersona(this.value)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 6px; outline: none; cursor: pointer; font-size: 0.85rem;">
-                            <option value="standard" style="background: #1e1e1e; color: white;">🤖 Asisten Standard</option>
-                            <option value="programmer" style="background: #1e1e1e; color: white;">💻 Programmer</option>
-                            <option value="santai" style="background: #1e1e1e; color: white;">😎 Gaya Santai</option>
-                        </select>
-                    </div>
-
-                    <!-- Export Chat Button -->
-                    <button onclick="exportChat()" title="Download Percakapan" style="background: transparent; border: none; color: #aaa; cursor: pointer; font-size: 1.1rem; transition: color 0.2s;">
-                        <i class="fa-solid fa-download"></i>
-                    </button>
                 </div>
             </header>
 
