@@ -601,6 +601,7 @@ def chat():
         # ---------------------------------------------------------------
         
         def generate():
+            nonlocal user_message
             try:
                 # 1. SETUP FORMAT VISION UNTUK MODEL OPENAI COMPATIBLE (Gemini & OpenRouter)
                 openai_msg_content = user_message
@@ -863,6 +864,7 @@ def chat_regenerate():
         # ---------------------------------------------------------------
         
         def generate():
+            nonlocal user_message
             try:
                 # 1. SETUP FORMAT VISION UNTUK MODEL OPENAI COMPATIBLE (Gemini & OpenRouter)
                 openai_msg_content = user_message
