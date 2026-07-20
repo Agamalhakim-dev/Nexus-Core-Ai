@@ -179,7 +179,7 @@ function processFiles(files) {
                 name: file.name,
                 content: event.target.result,
                 is_image: isImage,
-                type: file.type || (isImage ? 'image/jpeg' : 'text/plain')
+                type: file.type || (isImage ? 'image/jpeg' : 'text/plain'),
                 is_pdf: false
             });
             renderFilePreview();
