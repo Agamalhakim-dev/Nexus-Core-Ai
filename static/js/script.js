@@ -664,18 +664,20 @@ function sendMessage() {
         
         // Buat pesan UI
         if (rawMessage) {
-             uiDisplayMessage = `${rawMessage}\n\n📄 [Melampirkan ${pendingFiles.length} file]`;
+             uiDisplayMessage = rawMessage;
         } else {
-             uiDisplayMessage = `📄 [Mengirim ${pendingFiles.length} file]`;
-             if (!fileContexts && imagesPayload.length > 0) {
-                 combinedMessage = "Tolong analisis gambar ini.";
-             }
+             uiDisplayMessage = '';
+        }
+        if (!fileContexts && imagesPayload.length === 0 && !rawMessage) {
+            combinedMessage = "Tolong analisis file lampiran ini.";
+        }
+        if (!fileContexts && imagesPayload.length > 0 && !rawMessage) {
+            combinedMessage = "Tolong analisis gambar ini.";
         }
     }
-    
-    // Tampilkan pesan pengguna dengan lampiran (jika ada)
-    const attachments = { images: imagesPayload };
-    displayMessage(uiDisplayMessage, "user", false, rawMessage, attachments);
+    // Buat pesan UI dengan lampiran terpisah
+    const attachments = { images: imagesPayload, files: pendingFiles.filter(f => !f.is_image) };
+    displayMessage(rawMessage, "user", false, rawMessage, attachments);
     
     input.value = "";
     input.style.height = "auto"; // Reset tinggi textarea setelah dikirim
@@ -912,12 +914,47 @@ function displayMessage(text, sender, isHtml = false, rawText = "", attachments 
     
     let innerContent = "";
     let attachmentHTML = '';
-    if (sender === 'user' && attachments && attachments.images && attachments.images.length > 0) {
-        attachmentHTML += '<div class="message-attachments">';
-        attachments.images.forEach(imgData => {
-            attachmentHTML += `<img src="${imgData}" class="chat-image-thumbnail" alt="lampiran gambar" onclick="openLightbox(this.src)">`;
-        });
-        attachmentHTML += '</div>';
+    if (sender === 'user' && attachments) {
+        // --- GAMBAR ---
+        if (attachments.images && attachments.images.length > 0) {
+            attachmentHTML += '<div class="chat-attachments-grid">';
+            attachments.images.forEach(imgObj => {
+                const imgSrc = imgObj.data || imgObj;
+                const imgName = imgObj.name || 'Gambar';
+                attachmentHTML += `
+                    <div class="chat-image-card" onclick="openLightbox('${imgSrc}')">
+                        <img src="${imgSrc}" alt="${imgName}" class="chat-image-thumbnail">
+                        <div class="image-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                    </div>`;
+            });
+            attachmentHTML += '</div>';
+        }
+        // --- FILE DOKUMEN ---
+        if (attachments.files && attachments.files.length > 0) {
+            attachmentHTML += '<div class="chat-file-cards">';
+            attachments.files.forEach(f => {
+                const ext = f.name.split('.').pop().toLowerCase();
+                let icon = 'fa-file';
+                let color = '#9ca3af';
+                if (['pdf'].includes(ext)) { icon = 'fa-file-pdf'; color = '#ef4444'; }
+                else if (['doc','docx'].includes(ext)) { icon = 'fa-file-word'; color = '#3b82f6'; }
+                else if (['xls','xlsx','csv'].includes(ext)) { icon = 'fa-file-excel'; color = '#22c55e'; }
+                else if (['ppt','pptx'].includes(ext)) { icon = 'fa-file-powerpoint'; color = '#f97316'; }
+                else if (['txt','md'].includes(ext)) { icon = 'fa-file-lines'; color = '#a78bfa'; }
+                else if (['zip','rar','7z'].includes(ext)) { icon = 'fa-file-zipper'; color = '#eab308'; }
+                attachmentHTML += `
+                    <div class="chat-file-card">
+                        <div class="file-card-icon" style="color: ${color}">
+                            <i class="fa-solid ${icon}"></i>
+                        </div>
+                        <div class="file-card-info">
+                            <span class="file-card-name">${f.name}</span>
+                            <span class="file-card-ext">${ext.toUpperCase()}</span>
+                        </div>
+                    </div>`;
+            });
+            attachmentHTML += '</div>';
+        }
     }
 
     let textHTML = '';
