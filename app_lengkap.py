@@ -391,6 +391,33 @@ def mobile_login():
     return "Invalid session", 400
 
 
+@app.route("/api/auth/login", methods=["POST"])
+def auth_login():
+    """Endpoint login standar menggunakan username dan password."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "error": "Data tidak valid"}), 400
+
+    username = data.get("username", "").strip()
+    password = data.get("password", "").strip()
+
+    if not username or not password:
+        return jsonify({"success": False, "error": "Username dan password wajib diisi"})
+
+    # Validasi: siapa saja bisa login asalkan username & password tidak kosong
+    # Gunakan username sebagai identitas guest yang unik
+    import hashlib
+    user_id = hashlib.md5(f"{username}{password}".encode()).hexdigest()[:8]
+    user_info = {
+        "email": f"{username.lower().replace(' ','_')}_{user_id}@nexuscore.local",
+        "name": username,
+        "picture": f"https://ui-avatars.com/api/?name={username}&background=random&color=fff",
+        "is_guest": True
+    }
+
+    session["user"] = user_info
+    session.permanent = True
+    return jsonify({"success": True})
 
 @app.route("/logout")
 def logout():

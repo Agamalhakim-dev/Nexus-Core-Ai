@@ -70,67 +70,136 @@
                     <span class="login-logo-name" style="font-size:1rem;">Nexuscore ai</span>
                 </div>
                 <h2>Selamat Datang di<br>Nexuscore AI</h2>
-                <p>Silakan masuk menggunakan akun Anda untuk memulai percakapan cerdas tanpa batas.</p>
+                <p>Silakan masuk untuk memulai percakapan cerdas tanpa batas.</p>
                 <span class="version-tag">v1.2.0</span>
             </div>
 
             <!-- DIVIDER -->
             <div class="login-divider"></div>
 
-            <!-- KANAN: QR Code -->
+            <!-- KANAN: Form Login + QR Tersembunyi -->
             <div class="login-right">
-                <p style="font-size:0.8em; color:#aaa; margin:0; text-align:center;">Scan QR menggunakan<br>HP untuk masuk</p>
-                <div id="qrcode-container" style="padding:10px; background:white; border-radius:12px; width:160px; height:160px; display:flex; justify-content:center; align-items:center;"></div>
-                <p id="qr-status-msg" style="font-size:0.75em; color:#777; margin:0; text-align:center;">Pastikan HP di jaringan Wi-Fi yang sama</p>
+                <!-- Form Login Standar -->
+                <div id="login-form-panel">
+                    <p style="font-size:0.85em; color:#aaa; margin:0 0 16px 0; text-align:center;">Masuk ke Nexuscore AI</p>
+                    <form id="standard-login-form" onsubmit="submitStandardLogin(event)" autocomplete="off">
+                        <div class="login-input-group">
+                            <i class="fa-solid fa-user login-input-icon"></i>
+                            <input type="text" id="login-username" placeholder="Nama pengguna" required autocomplete="username">
+                        </div>
+                        <div class="login-input-group">
+                            <i class="fa-solid fa-lock login-input-icon"></i>
+                            <input type="password" id="login-password" placeholder="Kata sandi" required autocomplete="current-password">
+                        </div>
+                        <p id="login-error-msg" style="color:#ef4444; font-size:0.75rem; margin:4px 0 0 0; display:none; text-align:center;"></p>
+                        <button type="submit" class="login-submit-btn">
+                            <span id="login-btn-text">Masuk</span>
+                            <i class="fa-solid fa-arrow-right-to-bracket" id="login-btn-icon"></i>
+                        </button>
+                    </form>
+                    <div style="text-align:center; margin-top:14px;">
+                        <a href="#" onclick="toggleQRPanel(event)" style="font-style:italic; color:#60a5fa; font-size:0.8rem; text-decoration:underline; cursor:pointer;">Tidak bisa login?</a>
+                    </div>
+                </div>
+
+                <!-- Panel QR Code (Tersembunyi) -->
+                <div id="qr-panel" style="display:none; text-align:center;">
+                    <p style="font-size:0.8em; color:#aaa; margin:0 0 10px 0;">Scan QR menggunakan<br>HP yang terhubung ke Wi-Fi yang sama</p>
+                    <div id="qrcode-container" style="padding:10px; background:white; border-radius:12px; width:160px; height:160px; display:flex; justify-content:center; align-items:center; margin:0 auto;"></div>
+                    <p id="qr-status-msg" style="font-size:0.75em; color:#777; margin:10px 0 0 0; text-align:center;">Menunggu pemindaian...</p>
+                    <div style="text-align:center; margin-top:10px;">
+                        <a href="#" onclick="toggleQRPanel(event)" style="font-style:italic; color:#60a5fa; font-size:0.8rem; text-decoration:underline; cursor:pointer;">← Kembali ke login</a>
+                    </div>
+                </div>
             </div>
+
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
             <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    fetch("/api/auth/qrcode")
-                        .then(res => res.json())
-                        .then(data => {
-                            if(data.session_id) {
-                                const sid = data.session_id;
-                                const ip = data.local_ip || "localhost";
-                                const port = window.location.port ? ":" + window.location.port : "";
-                                const protocol = window.location.protocol;
-                                const loginUrl = protocol + "//" + ip + port + "/mobile-login?sid=" + sid;
-                                
-                                // Generate QR Code
-                                new QRCode(document.getElementById("qrcode-container"), {
-                                    text: loginUrl,
-                                    width: 150,
-                                    height: 150,
-                                    colorDark : "#000000",
-                                    colorLight : "#ffffff",
-                                    correctLevel : QRCode.CorrectLevel.H
-                                });
-                                
-                                // Start polling
-                                setInterval(() => {
-                                    fetch("/api/auth/status?sid=" + sid)
-                                        .then(r => r.json())
-                                        .then(status => {
-                                            if(status.success) {
-                                                const container = document.getElementById("qrcode-container");
-                                                container.innerHTML = "<div class=\"loader\"></div>";
-                                                
-                                                const msgElem = document.getElementById("qr-status-msg");
-                                                if (msgElem) {
-                                                    msgElem.innerText = "✅ Login Berhasil! Mengalihkan ke dashboard...";
-                                                    msgElem.style.color = "#4CAF50";
-                                                    msgElem.style.fontWeight = "bold";
-                                                }
-                                                
-                                                setTimeout(() => {
-                                                    window.location.reload();
-                                                }, 2000);
-                                            }
+                let qrGenerated = false;
+
+                function toggleQRPanel(e) {
+                    e.preventDefault();
+                    const formPanel = document.getElementById('login-form-panel');
+                    const qrPanel   = document.getElementById('qr-panel');
+                    const isShowingForm = formPanel.style.display !== 'none';
+
+                    if (isShowingForm) {
+                        formPanel.style.display = 'none';
+                        qrPanel.style.display   = 'block';
+                        if (!qrGenerated) {
+                            qrGenerated = true;
+                            fetch("/api/auth/qrcode")
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.session_id) {
+                                        const sid = data.session_id;
+                                        const ip = data.local_ip || "localhost";
+                                        const port = window.location.port ? ":" + window.location.port : "";
+                                        const protocol = window.location.protocol;
+                                        const loginUrl = protocol + "//" + ip + port + "/mobile-login?sid=" + sid;
+
+                                        new QRCode(document.getElementById("qrcode-container"), {
+                                            text: loginUrl, width: 150, height: 150,
+                                            colorDark: "#000000", colorLight: "#ffffff",
+                                            correctLevel: QRCode.CorrectLevel.H
                                         });
-                                }, 2000);
-                            }
-                        });
-                });
+
+                                        setInterval(() => {
+                                            fetch("/api/auth/status?sid=" + sid)
+                                                .then(r => r.json())
+                                                .then(status => {
+                                                    if (status.success) {
+                                                        document.getElementById("qrcode-container").innerHTML = '<div class="loader"></div>';
+                                                        const msg = document.getElementById("qr-status-msg");
+                                                        if (msg) { msg.innerText = "✅ Login Berhasil! Mengalihkan..."; msg.style.color = "#4CAF50"; }
+                                                        setTimeout(() => window.location.reload(), 2000);
+                                                    }
+                                                });
+                                        }, 2000);
+                                    }
+                                });
+                        }
+                    } else {
+                        formPanel.style.display = 'block';
+                        qrPanel.style.display   = 'none';
+                    }
+                }
+
+                function submitStandardLogin(e) {
+                    e.preventDefault();
+                    const username = document.getElementById('login-username').value.trim();
+                    const password = document.getElementById('login-password').value;
+                    const errMsg   = document.getElementById('login-error-msg');
+                    const btnText  = document.getElementById('login-btn-text');
+                    const btnIcon  = document.getElementById('login-btn-icon');
+
+                    btnText.textContent = 'Memproses...';
+                    btnIcon.className   = 'fa-solid fa-spinner fa-spin';
+                    errMsg.style.display = 'none';
+
+                    fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            errMsg.textContent   = data.error || 'Username atau password salah.';
+                            errMsg.style.display = 'block';
+                            btnText.textContent  = 'Masuk';
+                            btnIcon.className    = 'fa-solid fa-arrow-right-to-bracket';
+                        }
+                    })
+                    .catch(() => {
+                        errMsg.textContent   = 'Terjadi kesalahan. Coba lagi.';
+                        errMsg.style.display = 'block';
+                        btnText.textContent  = 'Masuk';
+                        btnIcon.className    = 'fa-solid fa-arrow-right-to-bracket';
+                    });
+                }
             </script>
             
         </div>
@@ -189,13 +258,7 @@
                             <option value="santai" style="background: #1e1e1e; color: white;">😎 Gaya Santai</option>
                         </select>
                     </div>
-                    <!-- Export Chat Button (Dipindah ke Sidebar) -->
-                    <button class="action-list-btn" onclick="exportChat()" title="Download Percakapan">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <i class="fa-solid fa-download"></i>
-                            <span>Export Percakapan</span>
-                        </div>
-                    </button>
+                    <!-- Export Chat Button dihapus sesuai permintaan user -->
                 </div>
                 <div id="session-list">
                     <!-- Riwayat obrolan dimuat via JS -->
