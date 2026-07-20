@@ -122,6 +122,50 @@ def ban_user(email: str):
             json.dump(banned, f, indent=4)
 
 # ============================================================================
+# UNIVERSAL VISION (GEMINI OCR)
+# ============================================================================
+
+def analyze_image_with_gemini(image_b64: str, mime_type: str = "image/jpeg") -> str:
+    """
+    Fungsi bridge untuk merubah gambar menjadi teks deskriptif menggunakan Gemini 2.5 Flash,
+    sehingga model buta (seperti DeepSeek) tetap bisa memahami konten gambar.
+    """
+    try:
+        gemini_key = os.environ.get("GOOGLE_API_KEY")
+        if not gemini_key:
+            return "[Error Visual: Kunci API Gemini tidak ditemukan]"
+        
+        client = OpenAI(api_key=gemini_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "Kamu bertindak sebagai sistem 'Visual Preprocessor' untuk model AI utama. "
+                                "Tugasmu HANYA mendeskripsikan dengan SANGAT DETAIL apa yang ada di gambar ini. "
+                                "Jika ada teks, ekstrak SEMUA teksnya (OCR). Jelaskan warna, pola, suasana, rumus, atau elemen apapun secara faktual. "
+                                "Jangan memberi salam, jangan menjawab persoalan, cukup deskripsikan saja."
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": image_b64}
+                    }
+                ]
+            }
+        ]
+        
+        completion = client.chat.completions.create(
+            model="gemini-2.5-flash",
+            messages=messages,
+            temperature=0.2,
+        )
+        return completion.choices[0].message.content
+    except Exception as e:
+        safe_log(f"[Vision Bridge Error]: {e}")
+        return f"[Error Sistem Visual gagal membaca gambar: {str(e)}]"
+
+# ============================================================================
 # SECTION 6: SYSTEM PROMPT
 # ============================================================================
 
@@ -561,13 +605,29 @@ def chat():
                 # 1. SETUP FORMAT VISION UNTUK MODEL OPENAI COMPATIBLE (Gemini & OpenRouter)
                 openai_msg_content = user_message
                 if images:
-                    openai_msg_content = [{"type": "text", "text": user_message}]
-                    for img_b64 in images:
-                        openai_msg_content.append({
-                            "type": "image_url",
-                            "image_url": {"url": img_b64}
-                        })
-
+                    if selected_model == "gemini":
+                        openai_msg_content = [{"type": "text", "text": user_message}]
+                        for img_obj in images:
+                            img_data = img_obj.get("data") if isinstance(img_obj, dict) else img_obj
+                            openai_msg_content.append({
+                                "type": "image_url",
+                                "image_url": {"url": img_data}
+                            })
+                    else:
+                        # Gunakan Gemini OCR Bridge untuk model Non-Vision (seperti DeepSeek)
+                        ocr_descriptions = []
+                        for img_obj in images:
+                            img_data = img_obj.get("data") if isinstance(img_obj, dict) else img_obj
+                            img_name = img_obj.get("name", "Image") if isinstance(img_obj, dict) else "Image"
+                            img_type = img_obj.get("type", "image/jpeg") if isinstance(img_obj, dict) else "image/jpeg"
+                            
+                            desc = analyze_image_with_gemini(img_data, img_type)
+                            ocr_descriptions.append(f"[SISTEM VISUAL: Gambar terlampir bernama '{img_name}' (Tipe: {img_type}) telah dianalisis. Hasil observasi: {desc}]")
+                        
+                        ocr_text = "\n\n".join(ocr_descriptions)
+                        user_message = f"{user_message}\n\n{ocr_text}"
+                        openai_msg_content = user_message
+                        
                 if selected_model == "gemini":
                     gemini_key = os.environ.get("GOOGLE_API_KEY")
                     ai_messages.append({"role": "user", "content": openai_msg_content})
@@ -807,12 +867,28 @@ def chat_regenerate():
                 # 1. SETUP FORMAT VISION UNTUK MODEL OPENAI COMPATIBLE (Gemini & OpenRouter)
                 openai_msg_content = user_message
                 if images:
-                    openai_msg_content = [{"type": "text", "text": user_message}]
-                    for img_b64 in images:
-                        openai_msg_content.append({
-                            "type": "image_url",
-                            "image_url": {"url": img_b64}
-                        })
+                    if selected_model == "gemini":
+                        openai_msg_content = [{"type": "text", "text": user_message}]
+                        for img_obj in images:
+                            img_data = img_obj.get("data") if isinstance(img_obj, dict) else img_obj
+                            openai_msg_content.append({
+                                "type": "image_url",
+                                "image_url": {"url": img_data}
+                            })
+                    else:
+                        # Gunakan Gemini OCR Bridge untuk model Non-Vision (seperti DeepSeek)
+                        ocr_descriptions = []
+                        for img_obj in images:
+                            img_data = img_obj.get("data") if isinstance(img_obj, dict) else img_obj
+                            img_name = img_obj.get("name", "Image") if isinstance(img_obj, dict) else "Image"
+                            img_type = img_obj.get("type", "image/jpeg") if isinstance(img_obj, dict) else "image/jpeg"
+                            
+                            desc = analyze_image_with_gemini(img_data, img_type)
+                            ocr_descriptions.append(f"[SISTEM VISUAL: Gambar terlampir bernama '{img_name}' (Tipe: {img_type}) telah dianalisis. Hasil observasi: {desc}]")
+                        
+                        ocr_text = "\n\n".join(ocr_descriptions)
+                        user_message = f"{user_message}\n\n{ocr_text}"
+                        openai_msg_content = user_message
 
                 if selected_model == "gemini":
                     gemini_key = os.environ.get("GOOGLE_API_KEY")

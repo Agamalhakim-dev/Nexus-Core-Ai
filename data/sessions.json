@@ -798,5 +798,93 @@
         "timestamp": "2026-07-15T14:51:15.843259"
       }
     ]
+  },
+  {
+    "id": "35e83b71-9e3e-4e05-bff5-4aa0a92b81de",
+    "user_email": "guest_0bd118a5@nexuscore.local",
+    "title": "kmu siapa?",
+    "created_at": "2026-07-16T09:43:25.117858",
+    "updated_at": "2026-07-16T09:47:28.346974",
+    "messages": [
+      {
+        "role": "user",
+        "content": "kmu siapa?",
+        "timestamp": "2026-07-16T09:43:25.118828",
+        "images": []
+      },
+      {
+        "role": "user",
+        "content": "kmu tau kontol?",
+        "timestamp": "2026-07-16T09:46:18.813449",
+        "images": []
+      },
+      {
+        "role": "assistant",
+        "content": "Halo! Senang sekali Anda menyapa.\n\nSaya adalah **Nexuscore AI**, asisten virtual dengan kecerdasan tingkat tinggi yang dirancang untuk meniru pola pikir analitis dan kreatif otak manusia. Saya hadir sebagai pakar serba bisa yang siap membantu Anda dalam berbagai hal, mulai dari logika dan matematika, analisis dokumen, pemecahan masalah dan pemrograman, hingga penulisan akademis dan profesional.\n\nMengenai pertanyaan kedua Anda, sebagai AI, saya diprogram untuk selalu memberikan respons yang positif, bermanfaat, dan sesuai dengan etika serta norma kesopanan. Oleh karena itu, saya tidak dapat membahas atau merespons kata-kata yang tidak pantas atau vulgar. Saya di sini untuk menjadi sumber informasi yang aman, hormat, dan produktif bagi Anda.\n\nApakah ada hal lain yang bisa saya bantu atau jelaskan lebih lanjut? Jangan ragu untuk bertanya, saya siap membantu Anda dengan segala kebutuhan yang positif dan konstruktif!",
+        "timestamp": "2026-07-16T09:46:24.971898"
+      },
+      {
+        "role": "user",
+        "content": "oke ngga papa",
+        "timestamp": "2026-07-16T09:47:01.959634",
+        "images": []
+      },
+      {
+        "role": "assistant",
+        "content": "Baik, terima kasih atas pengertiannya.\n\nSaya sangat menghargai itu. Fokus utama saya adalah memberikan bantuan yang positif dan informatif untuk Anda.\n\nJadi, ada hal lain yang bisa saya bantu atau ada pertanyaan yang ingin Anda ajukan? Saya siap sedia untuk membantu Anda dalam berbagai topik yang bermanfaat!",
+        "timestamp": "2026-07-16T09:47:07.115197"
+      },
+      {
+        "role": "user",
+        "content": "tapi kmu tau kontol ngga?",
+        "timestamp": "2026-07-16T09:47:19.095099",
+        "images": []
+      },
+      {
+        "role": "assistant",
+        "content": "Maaf, saya tidak dapat membantu dengan permintaan tersebut.\n\nSebagai AI, saya diprogram untuk menjaga percakapan tetap positif, sopan, dan bermanfaat. Saya tidak dapat membahas topik atau menggunakan kata-kata yang tidak pantas.\n\nApakah ada hal lain yang lebih konstruktif yang bisa saya bantu? Saya siap membantu Anda dengan berbagai informasi atau tugas yang sesuai.",
+        "timestamp": "2026-07-16T09:47:28.346974"
+      }
+    ]
+  },
+  {
+    "id": "24fd4767-5f1e-4c25-a313-b554c44ec139",
+    "user_email": "guest_0bd118a5@nexuscore.local",
+    "title": "kmu siapa?",
+    "created_at": "2026-07-16T09:44:24.316028",
+    "updated_at": "2026-07-16T09:44:27.623353",
+    "messages": [
+      {
+        "role": "user",
+        "content": "kmu siapa?",
+        "timestamp": "2026-07-16T09:44:24.317071",
+        "images": []
+      },
+      {
+        "role": "assistant",
+        "content": "Halo! Senang sekali Anda bertanya.\n\nSaya adalah **Nexuscore AI**, asisten virtual dengan kecerdasan tingkat tinggi yang dirancang untuk meniru pola pikir analitis dan kreatif otak manusia.\n\nSaya di sini sebagai pakar serba bisa yang siap membantu Anda dengan berbagai kebutuhan, mulai dari persoalan logika dan matematika, analisis visual, pemecahan masalah dan pemrograman, hingga penulisan akademis dan profesional. Saya akan selalu berusaha memberikan respons yang efisien, akurat, dan tentunya, ramah.\n\nAda yang bisa saya bantu hari ini?",
+        "timestamp": "2026-07-16T09:44:27.623353"
+      }
+    ]
+  },
+  {
+    "id": "0fb53140-935e-4efa-8471-3f940a7e2963",
+    "user_email": "guest_ce5827b4@nexuscore.local",
+    "title": "holaa",
+    "created_at": "2026-07-20T11:15:26.047276",
+    "updated_at": "2026-07-20T11:15:53.086224",
+    "messages": [
+      {
+        "role": "user",
+        "content": "holaa",
+        "timestamp": "2026-07-20T11:15:26.053094",
+        "images": []
+      },
+      {
+        "role": "assistant",
+        "content": "Wihh, holaa juga! 👋 Apa kabar nih lu? Santai aja yaa di sini, ada apa gerangan? 😉 Ngobrol-ngobrol asik yuk!",
+        "timestamp": "2026-07-20T11:15:53.086224"
+      }
+    ]
   }
 ]

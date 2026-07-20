@@ -162,7 +162,8 @@ function processFiles(files) {
                     name: file.name,
                     content: text,
                     is_image: false,
-                    is_pdf: true
+                    is_pdf: true,
+                    type: file.type || 'application/pdf'
                 });
                 renderFilePreview();
             } catch (error) {
@@ -178,6 +179,7 @@ function processFiles(files) {
                 name: file.name,
                 content: event.target.result,
                 is_image: isImage,
+                type: file.type || (isImage ? 'image/jpeg' : 'text/plain')
                 is_pdf: false
             });
             renderFilePreview();
@@ -642,9 +644,13 @@ function sendMessage() {
         
         pendingFiles.forEach(f => {
             if (f.is_image) {
-                imagesPayload.push(f.content);
+                imagesPayload.push({
+                    name: f.name,
+                    type: f.type,
+                    data: f.content
+                });
             } else {
-                fileContexts += `\n--- [Start of file: ${f.name}] ---\n${f.content}\n--- [End of file: ${f.name}] ---\n`;
+                fileContexts += `\n[SISTEM: Pengguna melampirkan file bernama "${f.name}" (Jenis: ${f.type})]\nIsi File:\n${f.content}\n--- Akhir Isi File ---\n`;
             }
         });
         
